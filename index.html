@@ -11,12 +11,21 @@
     background-color: #fce4ec;
     text-align: center;
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
     height: 100vh;
     margin: 0;
     overflow: hidden;
+  }
+
+  .screen {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .active {
+    display: flex;
   }
 
   h1 {
@@ -25,17 +34,17 @@
     padding: 0 16px;
   }
 
-  #slideshow {
-    max-width: 240px;
+  img {
     border-radius: 12px;
+  }
+
+  /* Page 1 */
+  #intro img {
+    max-width: 260px;
     margin-bottom: 20px;
-    transition: opacity 0.4s ease-in-out;
   }
 
-  .buttons {
-    margin-top: 20px;
-  }
-
+  /* Buttons */
   button {
     padding: 14px 28px;
     font-size: 1.3rem;
@@ -55,45 +64,105 @@
     color: #e91e63;
     border: 2px solid #e91e63;
     position: absolute;
+    pointer-events: none; /* cannot click */
+  }
+
+  /* Page 2 images */
+  #gallery {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    padding: 16px;
+  }
+
+  #gallery img {
+    width: 140px;
+    height: 140px;
+    object-fit: cover;
+    opacity: 0;
+    animation: fadeIn 0.5s forwards;
+  }
+
+  @keyframes fadeIn {
+    to { opacity: 1; }
   }
 </style>
 </head>
 
 <body>
 
-<img id="slideshow" src="images/img1.jpg" alt="Memories">
+<!-- PAGE 1 -->
+<div id="intro" class="screen active">
+  <img src="https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExcWk5OW5tMGx6dHRiYnM3cWxpMWd2YXhnbGFqczh2Y3B1OXV2dHlydCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/wvYNSqBAMDVx8CEYkt/giphy.gif" alt="Cute bear">
 
-<h1 id="question">Hi Dad 💙, will you be my Valentine?</h1>
+  <h1 id="question">Hi Dad 💙, will you be my Valentine?</h1>
 
-<div class="buttons">
   <button id="yesBtn" onclick="sayYes()">Yes 💖</button>
-  <button id="noBtn" onclick="moveButton()" ontouchstart="moveButton()">No 🙃</button>
+  <button id="noBtn">No 🙃</button>
 </div>
 
-<!-- 🎵 Local music from repo -->
+<!-- PAGE 2 -->
+<div id="memories" class="screen">
+  <h1>YAY!!! Happy Valentine’s Day 💖💖💖</h1>
+  <div id="gallery"></div>
+</div>
+
+<!-- Music -->
 <audio id="bgMusic" loop preload="auto">
   <source src="music/subhanallah.mp3" type="audio/mpeg">
 </audio>
 
-<!-- 🎉 Confetti -->
+<!-- Confetti -->
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <script>
-/* ---------- Instant name rotation ---------- */
+/* -------- Name rotation -------- */
 const names = ["Dad 💙", "Mom 💕", "Shubhi 🌸"];
 let nameIndex = 0;
 
-function rotateNamesInstant() {
-  if (nameIndex < names.length) {
+setInterval(() => {
     document.getElementById("question").innerText =
-      `Hi ${names[nameIndex]}, will you be my Valentine?`;
-    nameIndex++;
-    setTimeout(rotateNamesInstant, 400);
-  }
-}
-rotateNamesInstant();
+    `Hi ${names[nameIndex]}, will you be my Valentine?`;
+    nameIndex = (nameIndex + 1) % names.length;
+}, 500);
 
-/* ---------- Image slideshow (10 images) ---------- */
+/* -------- No button proximity movement -------- */
+const noBtn = document.getElementById("noBtn");
+
+document.addEventListener("mousemove", (e) => {
+  const rect = noBtn.getBoundingClientRect();
+  const distX = Math.abs(e.clientX - rect.left);
+  const distY = Math.abs(e.clientY - rect.top);
+
+  if (distX < 100 && distY < 100) moveNo();
+});
+
+document.addEventListener("touchstart", moveNo);
+
+function moveNo() {
+  const maxX = window.innerWidth - 120;
+  const maxY = window.innerHeight - 120;
+  noBtn.style.left = Math.random() * maxX + "px";
+  noBtn.style.top = Math.random() * maxY + "px";
+}
+
+/* -------- Yes click -------- */
+function sayYes() {
+  document.getElementById("intro").classList.remove("active");
+  document.getElementById("memories").classList.add("active");
+
+  document.getElementById("bgMusic").play();
+
+  confetti({
+    particleCount: 200,
+    spread: 90,
+    origin: { y: 0.6 }
+  });
+
+  startGallery();
+}
+
+/* -------- Progressive gallery (10 images stay visible) -------- */
 const images = [
   "images/img1.jpg",
   "images/img2.jpg",
@@ -107,52 +176,22 @@ const images = [
   "images/img10.jpg"
 ];
 
-let imgIndex = 0;
-const slide = document.getElementById("slideshow");
+let galleryIndex = 0;
+const gallery = document.getElementById("gallery");
 
-setInterval(() => {
-  imgIndex = (imgIndex + 1) % images.length;
-  slide.style.opacity = 0;
+function startGallery() {
+  const interval = setInterval(() => {
+    if (galleryIndex >= images.length) {
+      clearInterval(interval);
+      return;
+    }
 
-  setTimeout(() => {
-    slide.src = images[imgIndex];
-    slide.style.opacity = 1;
-  }, 300);
-}, 2300);
+    const img = document.createElement("img");
+    img.src = images[galleryIndex];
+    gallery.appendChild(img);
 
-/* ---------- No button chaos ---------- */
-let moves = 0;
-function moveButton() {
-  moves++;
-  const btn = document.getElementById("noBtn");
-
-  const maxX = window.innerWidth - 120;
-  const maxY = window.innerHeight - 120;
-
-  btn.style.left = Math.random() * maxX + "px";
-  btn.style.top = Math.random() * maxY + "px";
-
-  if (moves > 6) btn.style.transform = "scale(0.8)";
-  if (moves > 10) btn.style.display = "none";
-}
-
-/* ---------- Yes click ---------- */
-function sayYes() {
-  document.getElementById("question").innerText =
-    "YAY!!! Happy Valentine’s Day 💖💖💖";
-
-  document.getElementById("yesBtn").style.display = "none";
-  document.getElementById("noBtn").style.display = "none";
-
-  // 🎵 Play music (mobile-safe)
-  document.getElementById("bgMusic").play();
-
-  // 🎉 Confetti
-  confetti({
-    particleCount: 200,
-    spread: 90,
-    origin: { y: 0.6 }
-  });
+    galleryIndex++;
+  }, 2200);
 }
 </script>
 

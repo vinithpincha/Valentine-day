@@ -6,134 +6,154 @@
 <title>Be My Valentine?</title>
 
 <style>
-    body {
-        font-family: 'Arial', sans-serif;
-        background-color: #fce4ec;
-        text-align: center;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        margin: 0;
-        overflow: hidden;
-    }
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #fce4ec;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+  }
 
-    h1 {
-        color: #d81b60;
-        font-size: 2.2rem;
-        padding: 0 16px;
-    }
+  h1 {
+    color: #d81b60;
+    font-size: 2.1rem;
+    padding: 0 16px;
+  }
 
-    img {
-        max-width: 240px;
-        border-radius: 12px;
-        margin-bottom: 20px;
-    }
+  #slideshow {
+    max-width: 240px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    transition: opacity 0.4s ease-in-out;
+  }
 
-    .buttons {
-        margin-top: 20px;
-    }
+  .buttons {
+    margin-top: 20px;
+  }
 
-    button {
-        padding: 14px 28px;
-        font-size: 1.4rem;
-        margin: 10px;
-        border: none;
-        border-radius: 12px;
-        cursor: pointer;
-        transition: 0.2s;
-    }
+  button {
+    padding: 14px 28px;
+    font-size: 1.3rem;
+    margin: 10px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+  }
 
-    #yesBtn {
-        background-color: #e91e63;
-        color: white;
-    }
+  #yesBtn {
+    background-color: #e91e63;
+    color: white;
+  }
 
-    #noBtn {
-        background-color: white;
-        color: #e91e63;
-        border: 2px solid #e91e63;
-        position: absolute;
-    }
-
-    @media (max-width: 480px) {
-        h1 { font-size: 1.9rem; }
-        button { font-size: 1.2rem; }
-    }
+  #noBtn {
+    background-color: white;
+    color: #e91e63;
+    border: 2px solid #e91e63;
+    position: absolute;
+  }
 </style>
 </head>
 
 <body>
 
-<img id="mainImage"
-src="https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExcWk5OW5tMGx6dHRiYnM3cWxpMWd2YXhnbGFqczh2Y3B1OXV2dHlydCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/wvYNSqBAMDVx8CEYkt/giphy.gif"
-alt="Cute bear">
+<img id="slideshow" src="images/img1.jpg" alt="Memories">
 
 <h1 id="question">Hi Dad 💙, will you be my Valentine?</h1>
 
 <div class="buttons">
-    <button id="yesBtn" onclick="sayYes()">Yes 💖</button>
-    <button id="noBtn" onclick="moveButton()" ontouchstart="moveButton()">No 🙃</button>
+  <button id="yesBtn" onclick="sayYes()">Yes 💖</button>
+  <button id="noBtn" onclick="moveButton()" ontouchstart="moveButton()">No 🙃</button>
 </div>
 
-<!-- Music -->
-<audio id="bgMusic" loop>
-    <source src="https://www.bensound.com/bensound-music/bensound-love.mp3" type="audio/mpeg">
+<!-- 🎵 Local music from repo -->
+<audio id="bgMusic" loop preload="auto">
+  <source src="music/subhanallah.mp3" type="audio/mpeg">
 </audio>
 
-<!-- Confetti -->
+<!-- 🎉 Confetti -->
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <script>
-    /* Name rotation */
-    const names = ["Dad 💙", "Mom 💕", "Shubhi 🌸"];
+/* ---------- Instant name rotation ---------- */
+const names = ["Dad 💙", "Mom 💕", "Shubhi 🌸"];
 let nameIndex = 0;
 
-setInterval(() => {
+function rotateNamesInstant() {
+  if (nameIndex < names.length) {
     document.getElementById("question").innerText =
-    `Hi ${names[nameIndex]}, will you be my Valentine?`;
-    nameIndex = (nameIndex + 1) % names.length;
-}, 500);
+      `Hi ${names[nameIndex]}, will you be my Valentine?`;
+    nameIndex++;
+    setTimeout(rotateNamesInstant, 400);
+  }
+}
+rotateNamesInstant();
 
+/* ---------- Image slideshow (10 images) ---------- */
+const images = [
+  "images/img1.jpg",
+  "images/img2.jpg",
+  "images/img3.jpg",
+  "images/img4.jpg",
+  "images/img5.jpg",
+  "images/img6.jpg",
+  "images/img7.jpg",
+  "images/img8.jpg",
+  "images/img9.jpg",
+  "images/img10.jpg"
+];
 
-    /* No button chaos */
-    let moves = 0;
-    function moveButton() {
-        moves++;
-        const btn = document.getElementById("noBtn");
+let imgIndex = 0;
+const slide = document.getElementById("slideshow");
 
-        const maxX = window.innerWidth - 120;
-        const maxY = window.innerHeight - 120;
+setInterval(() => {
+  imgIndex = (imgIndex + 1) % images.length;
+  slide.style.opacity = 0;
 
-        btn.style.left = Math.random() * maxX + "px";
-        btn.style.top = Math.random() * maxY + "px";
+  setTimeout(() => {
+    slide.src = images[imgIndex];
+    slide.style.opacity = 1;
+  }, 300);
+}, 2300);
 
-        if (moves > 6) btn.style.transform = "scale(0.8)";
-        if (moves > 10) btn.style.display = "none";
-    }
+/* ---------- No button chaos ---------- */
+let moves = 0;
+function moveButton() {
+  moves++;
+  const btn = document.getElementById("noBtn");
 
-    /* Yes click */
-    function sayYes() {
-        document.getElementById("question").innerText =
-        "YAY!!! Happy Valentine’s Day 💖💖💖";
+  const maxX = window.innerWidth - 120;
+  const maxY = window.innerHeight - 120;
 
-        document.getElementById("mainImage").src =
-        "https://media.tenor.com/gUiu1zyxfzYAAAAi/bear-kiss-bear-kisses.gif";
+  btn.style.left = Math.random() * maxX + "px";
+  btn.style.top = Math.random() * maxY + "px";
 
-        document.getElementById("yesBtn").style.display = "none";
-        document.getElementById("noBtn").style.display = "none";
+  if (moves > 6) btn.style.transform = "scale(0.8)";
+  if (moves > 10) btn.style.display = "none";
+}
 
-        /* Start music (mobile-safe) */
-        document.getElementById("bgMusic").play();
+/* ---------- Yes click ---------- */
+function sayYes() {
+  document.getElementById("question").innerText =
+    "YAY!!! Happy Valentine’s Day 💖💖💖";
 
-        /* Confetti */
-        confetti({
-            particleCount: 200,
-            spread: 90,
-            origin: { y: 0.6 }
-        });
-    }
+  document.getElementById("yesBtn").style.display = "none";
+  document.getElementById("noBtn").style.display = "none";
+
+  // 🎵 Play music (mobile-safe)
+  document.getElementById("bgMusic").play();
+
+  // 🎉 Confetti
+  confetti({
+    particleCount: 200,
+    spread: 90,
+    origin: { y: 0.6 }
+  });
+}
 </script>
 
 </body>

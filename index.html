@@ -10,18 +10,19 @@
     font-family: Arial, sans-serif;
     background-color: #fce4ec;
     text-align: center;
+    min-height: 100vh;
+    margin: 0;
+    overflow-x: hidden;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    margin: 0;
-    overflow: hidden;
   }
 
   .screen {
     display: none;
     flex-direction: column;
     align-items: center;
+    width: 100%;
   }
 
   .active {
@@ -30,21 +31,17 @@
 
   h1 {
     color: #d81b60;
-    font-size: 2.1rem;
+    font-size: 2rem;
     padding: 0 16px;
   }
 
-  img {
-    border-radius: 12px;
-  }
-
-  /* Page 1 */
+  /* ---------- PAGE 1 ---------- */
   #intro img {
     max-width: 260px;
+    border-radius: 12px;
     margin-bottom: 20px;
   }
 
-  /* Buttons */
   button {
     padding: 14px 28px;
     font-size: 1.3rem;
@@ -64,24 +61,32 @@
     color: #e91e63;
     border: 2px solid #e91e63;
     position: absolute;
-    pointer-events: none; /* cannot click */
+    pointer-events: none;
     left: 55%;
     top: 65%;
-}
   }
 
-  /* Page 2 images */
+  /* ---------- PAGE 2 ---------- */
+  #memories {
+    max-height: 100vh;
+    overflow-y: auto;
+    padding-bottom: 40px;
+    -webkit-overflow-scrolling: touch;
+  }
+
   #gallery {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    display: flex;
+    flex-direction: column;   /* 👈 one image per row */
+    align-items: center;
+    gap: 16px;
     padding: 16px;
+    width: 100%;
   }
 
   #gallery img {
-    width: 140px;
-    height: 140px;
-    object-fit: cover;
+    width: 90%;
+    max-width: 320px;
+    border-radius: 14px;
     opacity: 0;
     animation: fadeIn 0.5s forwards;
   }
@@ -110,16 +115,16 @@
   <div id="gallery"></div>
 </div>
 
-<!-- Music -->
+<!-- 🎵 Music -->
 <audio id="bgMusic" loop preload="auto">
   <source src="music/subhanallah.mp3" type="audio/mpeg">
 </audio>
 
-<!-- Confetti -->
+<!-- 🎉 Confetti -->
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <script>
-/* -------- Name rotation -------- */
+/* ---------- Name rotation ---------- */
 const names = ["Dad 💙", "Mom 💕", "Shubhi 🌸"];
 let nameIndex = 0;
 
@@ -129,27 +134,24 @@ setInterval(() => {
     nameIndex = (nameIndex + 1) % names.length;
 }, 500);
 
-/* -------- No button proximity movement -------- */
+/* ---------- No button proximity escape ---------- */
 const noBtn = document.getElementById("noBtn");
 
 document.addEventListener("mousemove", (e) => {
-  const rect = noBtn.getBoundingClientRect();
-  const distX = Math.abs(e.clientX - rect.left);
-  const distY = Math.abs(e.clientY - rect.top);
-
-  if (distX < 100 && distY < 100) moveNo();
+  const r = noBtn.getBoundingClientRect();
+  if (Math.abs(e.clientX - r.left) < 100 && Math.abs(e.clientY - r.top) < 100) {
+    moveNo();
+  }
 });
 
 document.addEventListener("touchstart", moveNo);
 
 function moveNo() {
-  const maxX = window.innerWidth - 120;
-  const maxY = window.innerHeight - 120;
-  noBtn.style.left = Math.random() * maxX + "px";
-  noBtn.style.top = Math.random() * maxY + "px";
+  noBtn.style.left = Math.random() * (window.innerWidth - 120) + "px";
+  noBtn.style.top  = Math.random() * (window.innerHeight - 120) + "px";
 }
 
-/* -------- Yes click -------- */
+/* ---------- Yes click ---------- */
 function sayYes() {
   document.getElementById("intro").classList.remove("active");
   document.getElementById("memories").classList.add("active");
@@ -165,7 +167,7 @@ function sayYes() {
   startGallery();
 }
 
-/* -------- Progressive gallery (10 images stay visible) -------- */
+/* ---------- Progressive gallery + gentle auto-scroll ---------- */
 const images = [
   "images/img1.jpg",
   "images/img2.jpg",
@@ -192,6 +194,11 @@ function startGallery() {
     const img = document.createElement("img");
     img.src = images[galleryIndex];
     gallery.appendChild(img);
+
+    // 👇 Gentle auto-scroll (Option A)
+    setTimeout(() => {
+      img.scrollIntoView({ behavior: "smooth", block: "end" });
+    }, 100);
 
     galleryIndex++;
   }, 2200);

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Be My Valentine?</title>
+
+<style>
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #fce4ec;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        overflow: hidden;
+    }
+
+    h1 {
+        color: #d81b60;
+        font-size: 2.2rem;
+        padding: 0 16px;
+    }
+
+    img {
+        max-width: 240px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+    }
+
+    .buttons {
+        margin-top: 20px;
+    }
+
+    button {
+        padding: 14px 28px;
+        font-size: 1.4rem;
+        margin: 10px;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    #yesBtn {
+        background-color: #e91e63;
+        color: white;
+    }
+
+    #noBtn {
+        background-color: white;
+        color: #e91e63;
+        border: 2px solid #e91e63;
+        position: absolute;
+    }
+
+    @media (max-width: 480px) {
+        h1 { font-size: 1.9rem; }
+        button { font-size: 1.2rem; }
+    }
+</style>
+</head>
+
+<body>
+
+<img id="mainImage"
+src="https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExcWk5OW5tMGx6dHRiYnM3cWxpMWd2YXhnbGFqczh2Y3B1OXV2dHlydCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/wvYNSqBAMDVx8CEYkt/giphy.gif"
+alt="Cute bear">
+
+<h1 id="question">Hi Dad 💙, will you be my Valentine?</h1>
+
+<div class="buttons">
+    <button id="yesBtn" onclick="sayYes()">Yes 💖</button>
+    <button id="noBtn" onclick="moveButton()" ontouchstart="moveButton()">No 🙃</button>
+</div>
+
+<!-- Music -->
+<audio id="bgMusic" loop>
+    <source src="https://www.bensound.com/bensound-music/bensound-love.mp3" type="audio/mpeg">
+</audio>
+
+<!-- Confetti -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<script>
+    /* Name rotation */
+    const names = ["Dad 💙", "Mom 💕", "Shubhi 🌸"];
+    let nameIndex = 0;
+
+    setInterval(() => {
+        document.getElementById("question").innerText =
+        `Hi ${names[nameIndex]}, will you be my Valentine?`;
+        nameIndex = (nameIndex + 1) % names.length;
+    }, 2500);
+
+    /* No button chaos */
+    let moves = 0;
+    function moveButton() {
+        moves++;
+        const btn = document.getElementById("noBtn");
+
+        const maxX = window.innerWidth - 120;
+        const maxY = window.innerHeight - 120;
+
+        btn.style.left = Math.random() * maxX + "px";
+        btn.style.top = Math.random() * maxY + "px";
+
+        if (moves > 6) btn.style.transform = "scale(0.8)";
+        if (moves > 10) btn.style.display = "none";
+    }
+
+    /* Yes click */
+    function sayYes() {
+        document.getElementById("question").innerText =
+        "YAY!!! Happy Valentine’s Day 💖💖💖";
+
+        document.getElementById("mainImage").src =
+        "https://media.tenor.com/gUiu1zyxfzYAAAAi/bear-kiss-bear-kisses.gif";
+
+        document.getElementById("yesBtn").style.display = "none";
+        document.getElementById("noBtn").style.display = "none";
+
+        /* Start music (mobile-safe) */
+        document.getElementById("bgMusic").play();
+
+        /* Confetti */
+        confetti({
+            particleCount: 200,
+            spread: 90,
+            origin: { y: 0.6 }
+        });
+    }
+</script>
+
+</body>
+</html>

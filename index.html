@@ -90,17 +90,12 @@ alt="Cute bear">
     const names = ["Dad 💙", "Mom 💕", "Shubhi 🌸"];
 let nameIndex = 0;
 
-function rotateNamesInstant() {
-    if (nameIndex < names.length) {
-        document.getElementById("question").innerText =
-        `Hi ${names[nameIndex]}, will you be my Valentine?`;
-        nameIndex++;
-        setTimeout(rotateNamesInstant, 400); // fast change (0.4s)
-    }
-}
+setInterval(() => {
+    document.getElementById("question").innerText =
+    `Hi ${names[nameIndex]}, will you be my Valentine?`;
+    nameIndex = (nameIndex + 1) % names.length;
+}, 500);
 
-// Run immediately on load
-rotateNamesInstant();
 
     /* No button chaos */
     let moves = 0;
